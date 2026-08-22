@@ -1,0 +1,30 @@
+name: Check learning resource prices
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check official pages
+        run: python scripts/check_prices.py
+      - name: Commit report when changed
+        run: |
+          git config user.name 'SchoolHub Price Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet; then
+            echo 'No changes detected.'
+          else
+            git add data/price-check.json
+            git commit -m 'Update price verification report'
+            git push
+          fi
