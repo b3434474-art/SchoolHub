@@ -3,127 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SchoolHub is a learning website and app directory for students and teachers.">
   <title>SchoolHub — School Learning Store</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
 <header class="topbar">
-  <a href="index.html" class="brand">
-    <span class="brand-icon">🏫</span>
-    <span>SchoolHub</span>
-  </a>
-
-  <nav>
+  <a href="index.html" class="brand"><span class="brand-icon">🏫</span><span>SchoolHub</span></a>
+  <nav aria-label="Main navigation">
     <a href="#apps">Learning Apps</a>
     <a href="student/">👨‍🎓 Student</a>
     <a href="teacher/">👩‍🏫 Teacher</a>
   </nav>
-
-  <button id="darkModeButton" class="icon-button" title="Dark mode">🌙</button>
+  <button id="darkModeButton" class="icon-button" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
 </header>
 
 <section class="hero">
   <div>
     <span class="eyebrow">🏫 SCHOOL LEARNING STORE</span>
     <h1>Find something awesome to learn.</h1>
-    <p>
-      Discover hundreds of learning websites and apps in one place.
-    </p>
+    <p>Discover learning websites and apps in one place. You can browse SchoolHub without creating an account.</p>
   </div>
-
-  <div class="hero-actions">
-    <button id="randomButton" class="primary-button">
-      🎲 Surprise Me
-    </button>
-  </div>
+  <div class="hero-actions"><button id="randomButton" class="primary-button">🎲 Surprise Me</button></div>
 </section>
 
-<section class="search-area">
-
-  <div class="search-box">
-    <span>🔎</span>
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="Search learning websites..."
-      autocomplete="off"
-    >
-  </div>
-
+<section class="search-area" aria-label="Search and filters">
+  <div class="search-box"><span aria-hidden="true">🔎</span><input id="searchInput" type="search" placeholder="Search learning websites..." autocomplete="off" aria-label="Search learning websites"></div>
   <div class="filters">
-
-    <select id="categoryFilter">
-      <option value="all">📚 All Categories</option>
-    </select>
-
-    <select id="priceFilter">
-      <option value="all">💰 All Prices</option>
-      <option value="free">🟢 Free</option>
-      <option value="freepaid">🟡 Free + Paid</option>
-      <option value="paid">🔴 Paid</option>
-      <option value="school">🏫 School Pricing</option>
-    </select>
-
-    <select id="accessFilter">
-      <option value="all">👤 All Access Types</option>
-      <option value="self">By yourself</option>
-      <option value="teacher">Teacher</option>
-      <option value="school">School</option>
-    </select>
-
-    <select id="sortFilter">
-      <option value="name">🔤 Name</option>
-      <option value="rating">⭐ Rating</option>
-      <option value="favorites">❤️ Favorites</option>
-    </select>
-
+    <select id="categoryFilter" aria-label="Filter by category"><option value="all">📚 All Categories</option></select>
+    <select id="priceFilter" aria-label="Filter by price"><option value="all">💰 All Prices</option><option value="free">🟢 Free</option><option value="free/paid">🟡 Free + Paid</option><option value="paid">🔴 Paid</option></select>
+    <select id="accessFilter" aria-label="Filter by access"><option value="all">👤 All Access Types</option><option value="by yourself">By yourself</option><option value="teacher">Teacher</option><option value="school">School</option></select>
+    <select id="sortFilter" aria-label="Sort results"><option value="name">🔤 Name</option><option value="rating">⭐ Rating</option><option value="favorites">❤️ Favorites</option></select>
   </div>
-
 </section>
 
-<section class="category-strip" id="categoryStrip"></section>
-
+<section class="category-strip" id="categoryStrip" aria-label="Categories"></section>
 <main id="apps" class="content">
-
   <div class="section-heading">
-    <div>
-      <h2>📚 Learning Websites</h2>
-      <p id="resultCount">Loading...</p>
-    </div>
-
-    <button id="favoritesButton" class="secondary-button">
-      ❤️ Favorites
-    </button>
+    <div><h2>📚 Learning Websites</h2><p id="resultCount">Loading...</p></div>
+    <button id="favoritesButton" class="secondary-button">❤️ Favorites</button>
   </div>
-
-  <div id="appGrid" class="app-grid"></div>
-
+  <div id="appGrid" class="app-grid" aria-live="polite"></div>
 </main>
 
-<div id="modal" class="modal hidden">
-  <div class="modal-card">
-
-    <button id="closeModal" class="modal-close">✕</button>
-
-    <div id="modalContent"></div>
-
-  </div>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Website details">
+  <div class="modal-card"><button id="closeModal" class="modal-close" aria-label="Close">✕</button><div id="modalContent"></div></div>
 </div>
-
-<div id="toast" class="toast"></div>
-
-<footer>
-  <strong>🏫 SchoolHub</strong>
-  <p>
-    A learning-resource directory. SchoolHub is not affiliated with the
-    websites listed.
-  </p>
-</footer>
-
+<footer><strong>🏫 SchoolHub</strong><p>A learning-resource directory. SchoolHub is not affiliated with the websites listed.</p></footer>
 <script src="app.js"></script>
-
-<script src="scripts/enhance.js"></script>
 </body>
-      </html>
+</html>
