@@ -5,6 +5,11 @@ on:
     # Every Sunday at 04:00 UTC.
     - cron: "0 4 * * 0"
   workflow_dispatch:
+  push:
+    paths:
+      - "scripts/logos.js"
+      - "scripts/update_logos.py"
+      - ".github/workflows/logo-check.yml"
 
 permissions:
   contents: write
