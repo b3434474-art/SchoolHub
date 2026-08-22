@@ -1,0 +1,45 @@
+name: Check and Update SchoolHub Logos
+
+on:
+  schedule:
+    # Every Sunday at 04:00 UTC.
+    - cron: "0 4 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: schoolhub-logo-check
+  cancel-in-progress: true
+
+jobs:
+  update-logos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out SchoolHub
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Check logos and safely update valid changes
+        run: python scripts/update_logos.py
+
+      - name: Commit changed logos
+        run: |
+          if git diff --quiet -- assets/logos; then
+            echo "No logo files changed."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/logos
+          git commit -m "chore: update SchoolHub logos"
+          git push
