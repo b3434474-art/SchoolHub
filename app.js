@@ -1,142 +1,15 @@
-/* SchoolHub - main homepage behavior */
+/* SchoolHub - 150 learning resources */
 (() => {
-  const apps = [
-    {name:'Khan Academy', emoji:'🎓', category:'Study Tools', price:'free', access:'by yourself', url:'https://www.khanacademy.org/'},
-    {name:'IXL', emoji:'➗', category:'Math', price:'paid', access:'by yourself', url:'https://www.ixl.com/'},
-    {name:'Google Classroom', emoji:'🏫', category:'Study Tools', price:'free', access:'teacher', url:'https://classroom.google.com/'},
-    {name:'Canvas', emoji:'🎨', category:'Study Tools', price:'free/paid', access:'teacher', url:'https://www.instructure.com/canvas'},
-    {name:'Quizizz', emoji:'🧠', category:'Educational Games', price:'free/paid', access:'by yourself', url:'https://quizizz.com/'},
-    {name:'Kahoot!', emoji:'🎮', category:'Educational Games', price:'free/paid', access:'by yourself', url:'https://kahoot.com/'},
-    {name:'Quizlet', emoji:'🗂️', category:'Study Tools', price:'free/paid', access:'by yourself', url:'https://quizlet.com/'},
-    {name:'PBS LearningMedia', emoji:'📺', category:'General Learning', price:'free', access:'by yourself', url:'https://www.pbslearningmedia.org/'},
-    {name:'Prodigy', emoji:'🧙', category:'Math', price:'free/paid', access:'by yourself', url:'https://www.prodigygame.com/'},
-    {name:'Zearn', emoji:'➕', category:'Math', price:'free', access:'by yourself', url:'https://www.zearn.org/'},
-    {name:'Math Playground', emoji:'🔢', category:'Math', price:'free/paid', access:'by yourself', url:'https://www.mathplayground.com/'},
-    {name:'ReadTheory', emoji:'📖', category:'Reading', price:'free', access:'by yourself', url:'https://readtheory.org/'},
-    {name:'CommonLit', emoji:'📚', category:'Reading', price:'free', access:'by yourself', url:'https://www.commonlit.org/'},
-    {name:'ReadWorks', emoji:'📘', category:'Reading', price:'free', access:'by yourself', url:'https://www.readworks.org/'},
-    {name:'CK-12', emoji:'🔬', category:'Science', price:'free', access:'by yourself', url:'https://www.ck12.org/'},
-    {name:'PhET Interactive Simulations', emoji:'🧪', category:'Science', price:'free', access:'by yourself', url:'https://phet.colorado.edu/'},
-    {name:'NASA STEM', emoji:'🚀', category:'Science', price:'free', access:'by yourself', url:'https://www.nasa.gov/stem/'},
-    {name:'iCivics', emoji:'🌎', category:'Social Studies', price:'free', access:'by yourself', url:'https://ed.icivics.org/'},
-    {name:'Scratch', emoji:'🐱', category:'Coding', price:'free', access:'by yourself', url:'https://scratch.mit.edu/'},
-    {name:'Code.org', emoji:'💻', category:'Coding', price:'free', access:'by yourself', url:'https://code.org/'},
-    {name:'freeCodeCamp', emoji:'🧑‍💻', category:'Coding', price:'free', access:'by yourself', url:'https://www.freecodecamp.org/'},
-    {name:'Tinkercad', emoji:'🧩', category:'Coding', price:'free', access:'by yourself', url:'https://www.tinkercad.com/'},
-    {name:'Duolingo', emoji:'🦉', category:'Languages', price:'free/paid', access:'by yourself', url:'https://www.duolingo.com/'},
-    {name:'SpanishDict', emoji:'🇪🇸', category:'Languages', price:'free', access:'by yourself', url:'https://www.spanishdict.com/'},
-    {name:'Art for Kids Hub', emoji:'🎨', category:'Arts', price:'free', access:'by yourself', url:'https://www.artforkidshub.com/'},
-    {name:'Chrome Music Lab', emoji:'🎵', category:'Arts', price:'free', access:'by yourself', url:'https://musiclab.chromeexperiments.com/'},
-    {name:'GeoGebra', emoji:'📐', category:'Math', price:'free', access:'by yourself', url:'https://www.geogebra.org/'},
-    {name:'Desmos', emoji:'📊', category:'Math', price:'free', access:'by yourself', url:'https://www.desmos.com/'},
-    {name:'Mathigon', emoji:'📐', category:'Math', price:'free', access:'by yourself', url:'https://mathigon.org/'},
-    {name:'TED-Ed', emoji:'💡', category:'General Learning', price:'free', access:'by yourself', url:'https://ed.ted.com/'},
-    {name:'Crash Course', emoji:'🎬', category:'General Learning', price:'free', access:'by yourself', url:'https://thecrashcourse.com/'},
-    {name:'OpenStax', emoji:'📚', category:'General Learning', price:'free', access:'by yourself', url:'https://openstax.org/'},
-    {name:'Internet Archive', emoji:'🗄️', category:'General Learning', price:'free', access:'by yourself', url:'https://archive.org/'},
-    {name:'Project Gutenberg', emoji:'📕', category:'Reading', price:'free', access:'by yourself', url:'https://www.gutenberg.org/'},
-    {name:'TypingClub', emoji:'⌨️', category:'Study Tools', price:'free/paid', access:'by yourself', url:'https://www.typingclub.com/'},
-    {name:'Nitro Type', emoji:'🏎️', category:'Educational Games', price:'free', access:'by yourself', url:'https://www.nitrotype.com/'}
-  ];
-
-  const grid = document.getElementById('appGrid');
-  const count = document.getElementById('resultCount');
-  const search = document.getElementById('searchInput');
-  const category = document.getElementById('categoryFilter');
-  const price = document.getElementById('priceFilter');
-  const access = document.getElementById('accessFilter');
-  const sort = document.getElementById('sortFilter');
-  const modal = document.getElementById('modal');
-  const modalContent = document.getElementById('modalContent');
-  const closeModal = document.getElementById('closeModal');
-  const favorites = new Set(JSON.parse(localStorage.getItem('schoolhub-favorites') || '[]'));
-
-  if (!grid) return;
-
-  const categories = [...new Set(apps.map(a => a.category))].sort();
-  categories.forEach(c => category?.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`));
-
-  function escapeHtml(value) {
-    return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  }
-
-  function logoMarkup(app) {
-    // Emoji is intentionally used as the guaranteed fallback. A real logo URL can
-    // be added later without breaking the card if the image fails to load.
-    return `<div class="app-logo-fallback" aria-label="${escapeHtml(app.name)} icon">${app.emoji}</div>`;
-  }
-
-  function render(list) {
-    grid.innerHTML = list.map(app => `
-      <article class="app-card" data-name="${escapeHtml(app.name)}">
-        <div class="app-card-top">
-          ${logoMarkup(app)}
-          <button class="favorite-button" data-favorite="${escapeHtml(app.name)}" aria-label="Favorite ${escapeHtml(app.name)}">${favorites.has(app.name) ? '❤️' : '🤍'}</button>
-        </div>
-        <h3>${escapeHtml(app.name)}</h3>
-        <p class="app-description">${escapeHtml(app.category)} learning resource.</p>
-        <div class="app-badges"><span>${escapeHtml(app.price)}</span><span>${escapeHtml(app.access)}</span></div>
-        <div class="app-actions">
-          <button class="secondary-button details-button" data-details="${escapeHtml(app.name)}">ℹ️ Details</button>
-          <a class="primary-button" href="${app.url}" target="_blank" rel="noopener noreferrer">Open Website ↗</a>
-        </div>
-      </article>`).join('');
-
-    count.textContent = `${list.length} website${list.length === 1 ? '' : 's'} shown`;
-
-    grid.querySelectorAll('[data-favorite]').forEach(button => button.addEventListener('click', () => {
-      const name = button.dataset.favorite;
-      favorites.has(name) ? favorites.delete(name) : favorites.add(name);
-      localStorage.setItem('schoolhub-favorites', JSON.stringify([...favorites]));
-      applyFilters();
-    }));
-
-    grid.querySelectorAll('[data-details]').forEach(button => button.addEventListener('click', () => {
-      const app = apps.find(a => a.name === button.dataset.details);
-      if (!app) return;
-      modalContent.innerHTML = `<h2>${escapeHtml(app.emoji)} ${escapeHtml(app.name)}</h2><p>${escapeHtml(app.category)} resource.</p><p><strong>Price:</strong> ${escapeHtml(app.price)}</p><p><strong>Access:</strong> ${escapeHtml(app.access)}</p><a class="primary-button" href="${app.url}" target="_blank" rel="noopener noreferrer">Open Website ↗</a>`;
-      modal.classList.remove('hidden');
-    }));
-  }
-
-  function applyFilters() {
-    const q = (search?.value || '').trim().toLowerCase();
-    const cat = category?.value || 'all';
-    const p = price?.value || 'all';
-    const a = access?.value || 'all';
-    let list = apps.filter(app =>
-      (!q || `${app.name} ${app.category} ${app.price} ${app.access}`.toLowerCase().includes(q)) &&
-      (cat === 'all' || app.category === cat) &&
-      (p === 'all' || app.price === p) &&
-      (a === 'all' || app.access === a)
-    );
-    if (sort?.value === 'rating') list.sort((x, y) => x.name.localeCompare(y.name));
-    else if (sort?.value === 'favorites') list.sort((x, y) => Number(favorites.has(y.name)) - Number(favorites.has(x.name)));
-    else list.sort((x, y) => x.name.localeCompare(y.name));
-    render(list);
-  }
-
-  [search, category, price, access, sort].forEach(el => el?.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', applyFilters));
-  document.getElementById('favoritesButton')?.addEventListener('click', () => {
-    const old = search.value;
-    search.value = '';
-    const list = apps.filter(a => favorites.has(a.name));
-    render(list);
-    search.value = old;
-  });
-  document.getElementById('randomButton')?.addEventListener('click', () => {
-    const app = apps[Math.floor(Math.random() * apps.length)];
-    window.open(app.url, '_blank', 'noopener,noreferrer');
-  });
-  document.getElementById('darkModeButton')?.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
-  closeModal?.addEventListener('click', () => modal.classList.add('hidden'));
-  modal?.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
-
-  render(apps);
+const apps=[
+['Khan Academy','🎓','General Learning','free','by yourself','https://www.khanacademy.org/'],['IXL','➗','Math','paid','by yourself','https://www.ixl.com/'],['Google Classroom','🏫','Study Tools','free','teacher','https://classroom.google.com/'],['Canvas','🎨','Study Tools','free/paid','teacher','https://www.instructure.com/canvas'],['Schoology','🏫','Study Tools','free/paid','teacher','https://www.schoology.com/'],['Seesaw','📝','Study Tools','free/paid','teacher','https://seesaw.me/'],['Moodle','📚','Study Tools','free','teacher/by yourself','https://moodle.org/'],['Microsoft Teams for Education','💬','Study Tools','free','teacher','https://www.microsoft.com/education/products/teams'],['Edmodo','🚫','Study Tools','discontinued','—','https://www.edmodo.com/'],['Nearpod','📊','Study Tools','free/paid','teacher','https://nearpod.com/'],['Pear Deck','📊','Study Tools','free/paid','teacher','https://www.peardeck.com/'],['Quizizz','🧠','Educational Games','free/paid','teacher/by yourself','https://quizizz.com/'],['Kahoot!','🎮','Educational Games','free/paid','teacher/by yourself','https://kahoot.com/'],['Quizlet','🗂️','Study Tools','free/paid','by yourself','https://quizlet.com/'],['BrainPOP','🧠','General Learning','paid','by yourself','https://www.brainpop.com/'],['BrainPOP Jr.','🧒','General Learning','paid','by yourself','https://jr.brainpop.com/'],['Discovery Education','🔎','General Learning','paid/school','teacher','https://www.discoveryeducation.com/'],['PBS LearningMedia','📺','General Learning','free','by yourself','https://www.pbslearningmedia.org/'],['PBS Kids','🦁','Educational Games','free','by yourself','https://pbskids.org/'],['Scholastic Learn at Home','📚','Reading','free','by yourself','https://classroommagazines.scholastic.com/support/learnathome.html'],['Epic!','📖','Reading','free/paid','teacher/parent','https://www.getepic.com/'],['Reading Eggs','🥚','Reading','paid','by yourself','https://readingeggs.com/'],['Raz-Kids','📖','Reading','paid','teacher','https://www.raz-kids.com/'],['Reading A-Z','📚','Reading','paid','teacher','https://www.readinga-z.com/'],['Starfall','⭐','Reading','free/paid','by yourself','https://www.starfall.com/'],['ABCMouse','🐭','General Learning','paid','by yourself','https://www.abcmouse.com/'],['Prodigy','🧙','Math','free/paid','teacher/by yourself','https://www.prodigygame.com/'],['DreamBox','🧮','Math','paid','teacher','https://www.dreambox.com/'],['Freckle','🐸','Math','free/paid','teacher/by yourself','https://www.freckle.com/'],['Zearn','➕','Math','free','by yourself','https://www.zearn.org/'],['ST Math','🧠','Math','paid','teacher','https://www.stmath.com/'],['Math Playground','🔢','Math','free/paid','by yourself','https://www.mathplayground.com/'],['MathGames','🎯','Math','free/paid','by yourself','https://www.mathgames.com/'],['SplashLearn','💦','Math','free/paid','by yourself','https://www.splashlearn.com/'],['DeltaMath','📐','Math','free','teacher','https://www.deltamath.com/'],['ALEKS','📐','Math','paid','teacher/school','https://www.aleks.com/'],['MATHia','🧮','Math','paid','teacher','https://www.carnegielearning.com/solutions/math/mathia/'],['Carnegie Learning','📘','Math','paid','teacher','https://www.carnegielearning.com/'],['Amplify','📚','General Learning','paid','teacher','https://amplify.com/'],['NWEA Learning','📊','General Learning','paid','teacher','https://www.nwea.org/'],['Achieve3000','📖','Reading','paid/school','teacher','https://www.achieve3000.com/'],['Lexia','📖','Reading','paid','teacher','https://www.lexialearning.com/'],['i-Ready','🎯','General Learning','paid','teacher','https://www.curriculumassociates.com/programs/i-ready'],['Study Island','🏝️','General Learning','paid','teacher/school','https://www.studyisland.com/'],['Edmentum','🎓','General Learning','paid','teacher','https://www.edmentum.com/'],['Exact Path','🛤️','General Learning','paid','teacher','https://www.edmentum.com/'],['Imagine Learning','💭','General Learning','paid','teacher','https://www.imaginelearning.com/'],['ReadTheory','📖','Reading','free','by yourself','https://readtheory.org/'],['CommonLit','📚','Reading','free','by yourself','https://www.commonlit.org/'],['NoRedInk','✍️','Writing','free/paid','teacher/by yourself','https://www.noredink.com/'],['Quill','✍️','Writing','free/paid','teacher/by yourself','https://www.quill.org/'],['ReadWorks','📖','Reading','free','by yourself','https://www.readworks.org/'],['TweenTribune','📰','Reading','free','by yourself','https://www.tweentribune.com/'],['Actively Learn','📚','Reading','free/paid','teacher/by yourself','https://www.activelylearn.com/'],['Writable','✍️','Writing','paid/school','teacher','https://www.writable.com/'],['Turnitin','🔍','Writing','paid/institution','teacher','https://www.turnitin.com/'],['Kami','📝','Study Tools','free/paid','teacher/by yourself','https://www.kamiapp.com/'],['Formative','📋','Study Tools','free/paid','teacher/by yourself','https://www.formative.com/'],['Classkick','✏️','Study Tools','free/paid','teacher','https://classkick.com/'],['Pear Assessment','📊','Study Tools','free/paid','teacher','https://www.peardeck.com/pear-assessment/'],['Socrative','📊','Study Tools','free/paid','teacher','https://www.socrative.com/'],['Mentimeter','💬','Study Tools','free/paid','teacher/by yourself','https://www.mentimeter.com/'],['Gimkit','🎮','Educational Games','free/paid','teacher/by yourself','https://www.gimkit.com/'],['Blooket','🎮','Educational Games','free/paid','teacher/by yourself','https://www.blooket.com/'],['Educaplay','🎯','Educational Games','free/paid','teacher/by yourself','https://www.educaplay.com/'],['Wordwall','🧩','Educational Games','free/paid','teacher/by yourself','https://wordwall.net/'],['LearningApps','🧩','Educational Games','free','teacher/by yourself','https://learningapps.org/'],['Flocabulary','🎤','General Learning','paid','teacher','https://www.flocabulary.com/'],['Brainly','🧠','Study Tools','free/paid','by yourself','https://brainly.com/'],['Schoolhouse.world','🏫','Study Tools','free','by yourself','https://schoolhouse.world/'],['CK-12','📘','Science','free','by yourself','https://www.ck12.org/'],['OpenStax','📚','General Learning','free','by yourself','https://openstax.org/'],['LibreTexts','📚','General Learning','free','by yourself','https://libretexts.org/'],['PhET Interactive Simulations','🧪','Science','free','by yourself','https://phet.colorado.edu/'],['ExploreLearning Gizmos','🧪','Science','paid','teacher/school','https://www.explorelearning.com/'],['Labster','🧪','Science','paid','teacher/school','https://www.labster.com/'],['Mystery Science','🔬','Science','paid','teacher/school','https://mysteryscience.com/'],['Generation Genius','🧬','Science','paid','by yourself','https://www.generationgenius.com/'],['Science Buddies','🔬','Science','free','by yourself','https://www.sciencebuddies.org/'],['NASA STEM','🚀','Science','free','by yourself','https://www.nasa.gov/stem/'],['NASA Climate Kids','🌎','Science','free','by yourself','https://climatekids.nasa.gov/'],['National Geographic Kids','🦁','Science','free','by yourself','https://kids.nationalgeographic.com/'],['Smithsonian Learning Lab','🏛️','General Learning','free','by yourself','https://learninglab.si.edu/'],['Smithsonian Science Education Center','🔬','Science','free/paid','by yourself','https://ssec.si.edu/'],['Exploratorium','🔬','Science','free','by yourself','https://www.exploratorium.edu/'],['HHMI BioInteractive','🧬','Science','free','by yourself','https://www.biointeractive.org/'],['BioRender','🧬','Science','free/paid','by yourself','https://www.biorender.com/'],['Crash Course','🎬','General Learning','free','by yourself','https://thecrashcourse.com/'],['TED-Ed','💡','General Learning','free','by yourself','https://ed.ted.com/'],['YouTube Learning','▶️','General Learning','free','by yourself','https://www.youtube.com/learning'],['Britannica School','📚','General Learning','paid','teacher/school','https://school.eb.com/'],['World Book Online','📖','General Learning','paid','school/library','https://www.worldbookonline.com/'],['Encyclopedia.com','📚','General Learning','free','by yourself','https://www.encyclopedia.com/'],['Ducksters','🦆','Social Studies','free','by yourself','https://www.ducksters.com/'],['History.com','🏛️','Social Studies','free','by yourself','https://www.history.com/'],['iCivics','🏛️','Social Studies','free','by yourself','https://www.icivics.org/'],['C-SPAN Classroom','🏛️','Social Studies','free','by yourself','https://www.c-span.org/classroom/'],['DocsTeach','📜','Social Studies','free','by yourself','https://www.docsteach.org/'],['Library of Congress Learning','🏛️','Social Studies','free','by yourself','https://www.loc.gov/education/'],['Smithsonian History Explorer','🏛️','Social Studies','free','by yourself','https://historyexplorer.si.edu/'],['Facing History & Ourselves','🌎','Social Studies','free/paid','by yourself','https://www.facinghistory.org/'],['Digital Public Library of America','📚','General Learning','free','by yourself','https://dp.la/'],['Project Gutenberg','📖','Reading','free','by yourself','https://www.gutenberg.org/'],['Internet Archive','🗄️','General Learning','free','by yourself','https://archive.org/'],['Poetry Foundation','📝','Reading','free','by yourself','https://www.poetryfoundation.org/'],['Read.gov','📖','Reading','free','by yourself','https://read.gov/'],['Storyline Online','📚','Reading','free','by yourself','https://storylineonline.net/'],['Lit2Go','📖','Reading','free','by yourself','https://etc.usf.edu/lit2go/'],['Common Sense Education','💡','General Learning','free','by yourself','https://www.commonsense.org/education/'],['Code.org','💻','Coding','free','teacher/by yourself','https://code.org/'],['Scratch','🐱','Coding','free','by yourself','https://scratch.mit.edu/'],['ScratchJr','🐱','Coding','free','by yourself','https://www.scratchjr.org/'],['Tynker','💻','Coding','free/paid','by yourself','https://www.tynker.com/'],['CodeHS','💻','Coding','free/paid','teacher/by yourself','https://codehs.com/'],['Codecademy','💻','Coding','free/paid','by yourself','https://www.codecademy.com/'],['freeCodeCamp','💻','Coding','free','by yourself','https://www.freecodecamp.org/'],['Khan Academy Computing','💻','Coding','free','by yourself','https://www.khanacademy.org/computing'],['GitHub Education','🐙','Coding','free for eligible users','by yourself','https://education.github.com/'],['W3Schools','🌐','Coding','free/paid','by yourself','https://www.w3schools.com/'],['HTML Dog','🐶','Coding','free','by yourself','https://www.htmldog.com/'],['Replit','💻','Coding','free/paid','by yourself','https://replit.com/'],['TypingClub','⌨️','Study Tools','free/paid','teacher/by yourself','https://www.typingclub.com/'],['Typing.com','⌨️','Study Tools','free/paid','teacher/by yourself','https://www.typing.com/'],['Nitro Type','🏎️','Educational Games','free','by yourself','https://www.nitrotype.com/'],['Duolingo','🦉','General Learning','free/paid','by yourself','https://www.duolingo.com/'],['Duolingo for Schools','🦉','General Learning','free','teacher','https://schools.duolingo.com/'],['Rosetta Stone','🗣️','General Learning','paid','teacher/school','https://www.rosettastone.com/'],['Memrise','🧠','General Learning','free/paid','by yourself','https://www.memrise.com/'],['Conjuguemos','🗣️','General Learning','free/paid','teacher/by yourself','https://conjuguemos.com/'],['SpanishDict','🇪🇸','General Learning','free','by yourself','https://www.spanishdict.com/'],['BBC Languages','🌐','General Learning','free','by yourself','https://www.bbc.co.uk/languages/'],['Art for Kids Hub','🎨','General Learning','free','by yourself','https://www.artforkidshub.com/'],['Canva for Education','🎨','General Learning','free for eligible users','teacher/school','https://www.canva.com/education/'],['Google Arts & Culture','🎨','General Learning','free','by yourself','https://artsandculture.google.com/'],['MetKids','🏛️','General Learning','free','by yourself','https://www.metmuseum.org/art/online-features/metkids/'],['Chrome Music Lab','🎵','General Learning','free','by yourself','https://musiclab.chromeexperiments.com/'],['MusicTheory.net','🎵','General Learning','free','by yourself','https://www.musictheory.net/'],['Noteflight','🎼','General Learning','free/paid','by yourself','https://www.noteflight.com/'],['Flat for Education','🎼','General Learning','free/paid','teacher','https://flat.io/education'],['Soundtrap for Education','🎵','General Learning','paid/school','teacher','https://www.soundtrap.com/edu/'],['Tinkercad','🧩','Coding','free','by yourself','https://www.tinkercad.com/'],['CoSpaces Edu','🕶️','Coding','free/paid','teacher/by yourself','https://www.cospaces.io/edu'],['Minecraft Education','⛏️','Educational Games','paid','teacher/school','https://education.minecraft.net/'],['LEGO Education','🧱','General Learning','free/paid','by yourself','https://education.lego.com/'],['CS First','💻','Coding','free','teacher/by yourself','https://csfirst.withgoogle.com/'],['TypingClub for Schools','⌨️','Study Tools','free/paid','teacher','https://www.typingclub.com/schools/'],['Khan Academy Kids','🧒','General Learning','free','by yourself','https://learn.khanacademy.org/khan-academy-kids/'],['Mathigon','📐','Math','free','by yourself','https://mathigon.org/'],['GeoGebra','📐','Math','free','by yourself','https://www.geogebra.org/'],['Desmos','📊','Math','free','teacher/by yourself','https://www.desmos.com/']
+].map(a=>({name:a[0],emoji:a[1],category:a[2],price:a[3],access:a[4],url:a[5]}));
+const grid=document.getElementById('appGrid'),count=document.getElementById('resultCount'),search=document.getElementById('searchInput'),category=document.getElementById('categoryFilter'),price=document.getElementById('priceFilter'),access=document.getElementById('accessFilter'),sort=document.getElementById('sortFilter'),modal=document.getElementById('modal'),modalContent=document.getElementById('modalContent'),closeModal=document.getElementById('closeModal');
+const favorites=new Set(JSON.parse(localStorage.getItem('schoolhub-favorites')||'[]'));if(!grid)return;
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+[...new Set(apps.map(a=>a.category))].sort().forEach(c=>category?.insertAdjacentHTML('beforeend',`<option value="${esc(c)}">${esc(c)}</option>`));
+function logo(a){return `<div class="app-logo-fallback" aria-label="${esc(a.name)} icon">${a.emoji}</div>`}
+function render(list){grid.innerHTML=list.map(a=>`<article class="app-card"><div class="app-card-top">${logo(a)}<button class="favorite-button" data-favorite="${esc(a.name)}" aria-label="Favorite">${favorites.has(a.name)?'❤️':'🤍'}</button></div><h3>${esc(a.name)}</h3><p class="app-description">${esc(a.category)} learning resource.</p><div class="app-badges"><span>${esc(a.price)}</span><span>${esc(a.access)}</span></div><div class="app-actions"><button class="secondary-button details-button" data-details="${esc(a.name)}">ℹ️ Details</button><a class="primary-button" href="${a.url}" target="_blank" rel="noopener noreferrer">Open Website ↗</a></div></article>`).join('');count.textContent=`${list.length} website${list.length===1?'':'s'} shown`;
+grid.querySelectorAll('[data-favorite]').forEach(b=>b.onclick=()=>{favorites.has(b.dataset.favorite)?favorites.delete(b.dataset.favorite):favorites.add(b.dataset.favorite);localStorage.setItem('schoolhub-favorites',JSON.stringify([...favorites]));apply()});grid.querySelectorAll('[data-details]').forEach(b=>b.onclick=()=>{const a=apps.find(x=>x.name===b.dataset.details);modalContent.innerHTML=`<h2>${esc(a.emoji)} ${esc(a.name)}</h2><p><strong>Category:</strong> ${esc(a.category)}</p><p><strong>Price:</strong> ${esc(a.price)}</p><p><strong>Access:</strong> ${esc(a.access)}</p><a class="primary-button" href="${a.url}" target="_blank" rel="noopener noreferrer">Open Website ↗</a>`;modal.classList.remove('hidden')})}
+function apply(){const q=(search?.value||'').toLowerCase().trim(),c=category?.value||'all',p=price?.value||'all',a=access?.value||'all';let list=apps.filter(x=>(!q||`${x.name} ${x.category} ${x.price} ${x.access}`.toLowerCase().includes(q))&&(c==='all'||x.category===c)&&(p==='all'||x.price===p)&&(a==='all'||x.access===a));if(sort?.value==='favorites')list.sort((x,y)=>Number(favorites.has(y.name))-Number(favorites.has(x.name)));else list.sort((x,y)=>x.name.localeCompare(y.name));render(list)}
+[search,category,price,access,sort].forEach(e=>e?.addEventListener(e.tagName==='INPUT'?'input':'change',apply));document.getElementById('randomButton')?.addEventListener('click',()=>{const a=apps[Math.floor(Math.random()*apps.length)];window.open(a.url,'_blank','noopener,noreferrer')});document.getElementById('darkModeButton')?.addEventListener('click',()=>document.body.classList.toggle('dark-mode'));closeModal?.addEventListener('click',()=>modal.classList.add('hidden'));modal?.addEventListener('click',e=>{if(e.target===modal)modal.classList.add('hidden')});render(apps);
 })();
-
-// Safe logo fallback available to future cards that use real image URLs.
-window.SchoolHubLogoFallback = function (img, fallback) {
-  if (img) img.style.display = 'none';
-  if (fallback) fallback.style.display = 'grid';
-};
